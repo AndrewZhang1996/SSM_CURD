@@ -1,0 +1,11 @@
+package com.etc.dao;
+
+import com.etc.pojo.UserPojo;
+
+public interface UserMapper {
+
+	UserPojo findByUname(String uname);
+
+	int insertUser(UserPojo user);
+
+}

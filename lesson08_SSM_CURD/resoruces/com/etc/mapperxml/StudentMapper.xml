@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.etc.dao.UserMapper" >
+	<resultMap id="rm1" type="com.etc.pojo.UserPojo">
+		<id column="id" property="id"></id>
+		<result column="uname" property="uname"></result>
+		<result column="password" property="password" />
+	</resultMap>
+
+<resultMap id="rm2" type="com.etc.pojo.UserPojo">
+		<id column="id" property="id"></id>
+		<result column="uname" property="uname"></result>
+		<result column="password" property="password" />
+				<result column="version" property="version"></result>
+	</resultMap>
+  <select id="findByUname" parameterType="java.lang.String" resultMap="rm1">
+  	select id, uname, password
+  	from user
+  	where uname = #{unam}
+  
+  </select>
+  <insert id="insertUser" parameterType="com.etc.pojo.UserPojo" >
+  		insert into userinfo_m (uname, password) values (#{uname}, #{password}); 
+  </insert>
+  
+  <select id="findByCondition"  resultMap="rm1" parameterType="com.etc.pojo.UserPojo">
+  		select id, uname , password
+  		from user
+  		<trim prefix=" where 1 = 1 " >
+  			<if test="uname != null and uname != ''">
+  				and uname like '%${uname}%'
+  			</if>
+  			<if test="password != null and password != ''">
+  				and password = #{password}
+  			</if>
+  		</trim>
+  </select>
+  <select id="findById"  resultMap="rm2" parameterType="java.lang.Integer" >
+  		select id, uname , password, version
+  		from user
+  		where id = #{id}
+  </select>
+  <update id="update" parameterType="com.etc.pojo.UserPojo">
+  		update user
+  		set uname = #{uname} , password=#{password}, version=version+1
+  		where id = #{id}
+  </update>
+  <delete id="delete">
+  		delete from user
+  		where id = #{id}
+  
+  </delete>
+  <select id="seacherByIdAndVersion" resultMap="rm2" >
+  		select id, uname , password, version
+  		from user
+  		where id = #{id} and version = #{version}
+  		for update
+  
+  </select>
+</mapper>

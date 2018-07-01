@@ -1,0 +1,61 @@
+package com.etc.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.etc.common.ServiceException;
+import com.etc.dao.UserMapper;
+import com.etc.pojo.UserPojo;
+
+@Service
+@Transactional
+public class UserService {
+
+	@Autowired
+	UserMapper mapper;
+
+	/**
+	 * 根据用户名进行查询并处理
+	 * @param user 输入的用户信息
+	 * @return true:存在， false:不存在
+	 * @throws ServiceException 业务逻辑异常： m001用户名不存在， m002用户和密码不匹配
+	 */
+	public boolean checkUser(UserPojo user) throws ServiceException {
+
+		boolean exist = false;
+		UserPojo newpo = mapper.findByUname(user.getUname());
+		
+		if (newpo == null) {
+			throw new ServiceException("m001");
+		} else if (!user.getPassword().equals(newpo.getPassword())) {
+				throw new ServiceException("m002");	
+		} else {
+			exist = true;
+		}
+		
+		return true;
+	}
+
+	// rollbackfor 发生异常的时候回滚
+	// 事务的传播:service层方法的调用时，事务是否再次开启。
+	@Transactional(rollbackFor=Exception.class, propagation=Propagation.REQUIRED)
+	public void insert(UserPojo user) throws ServiceException {
+		
+		
+		UserPojo newpo = mapper.findByUname(user.getUname());
+		if (newpo == null) {
+			
+			int i = mapper.insertUser(user);
+			if (i != 1) {
+				throw new ServiceException("e001");	
+			}
+		} else {
+			throw new ServiceException("m003");
+		}
+		
+		
+		
+	}
+}
